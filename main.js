@@ -51,6 +51,7 @@ app.post('/contacts', async (req, res) => {
     let newContact = req.body;
     // newContact.id = data[data.length - 1].id + 1
     data.push(newContact)
+    await fs.writeFile('./contacts.json', JSON.stringify(data, null, 2))
     res.send({ message: 'Thank you', result: data })
     if (error) {
         return res.status(500).send('connection failed')
@@ -65,6 +66,21 @@ app.put('/contacts/:id', async (req, res) => {
         return element.id === Number(contactId)
     })
     data[index] = changeContact
+    await fs.writeFile('./contacts.json', JSON.stringify(data, null, 2))
+    res.send(data)
+    if (error) {
+        return res.status(500).send('connection failed')
+    }
+})
+
+app.delete('/contacts/:id', async (req, res) => {
+    const [error, data] = await checkFile()
+    let contactID = req.params.id
+    const index = data.findIndex((element) => {
+        return element.id === Number(contactID)
+    })
+    data.splice(index, 1)
+    await fs.writeFile('./contacts.json', JSON.stringify(data, null, 2))
     res.send(data)
     if (error) {
         return res.status(500).send('connection failed')
